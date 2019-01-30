@@ -1,0 +1,159 @@
+//returns a pointer to the middle Student in a Student Record
+Student* getMidPointer(StudentRecord &s1){
+	int midpoint = s1.getLength() / 2;
+	Student* midPointer = s1.getHead();
+	
+	for(int i = 0; i < midpoint; ++i){
+		midPointer = midPointer->getNext();
+	}
+	
+	return midPointer;
+}
+
+//merges two Student Records together
+//this function assumes that a points to the head, midPoint points to the middle student, and b points to the last element
+void merge(StudentRecord &s1, Student* a, Student* midPoint, Student* b){
+	std::cout << "merge" << std::endl;
+	
+	StudentRecord tempRecord;
+	
+	Student* head = a;
+	Student* midPointer = midPoint;
+	Student* afterMid = midPointer->getNext();
+	Student* tail = b;
+	
+	while((head != midPointer) && (afterMid != tail)){
+		if(head->getScore() < afterMid->getScore()){
+			Student* tempStudent = new Student(head);
+			tempRecord.enrollStudent(tempStudent);
+			head = head->getNext();
+		}
+		else{
+			Student* tempStudent1 = new Student(afterMid);
+			tempRecord.enrollStudent(tempStudent1);
+			afterMid = afterMid->getNext();
+		}
+	}
+	
+	while(head != midPointer){
+		Student* tempStudent = new Student(head);
+		tempRecord.enrollStudent(tempStudent);
+		head = head->getNext();
+	}
+	
+	while(afterMid != tail){
+		Student* tempStudent1 = new Student(afterMid);
+		tempRecord.enrollStudent(tempStudent1);
+		afterMid = afterMid->getNext();
+	}
+	
+	//~s1;
+	//s1.makeEmpty();
+	//s1.printRecord();
+	
+	head = s1.getHead();
+	
+	while(head != NULL){
+		//head = tempRecord.findMaxUnsorted();
+		Student* temp = new Student(head);
+		
+		head->makeSorted();
+		
+		s1.enrollStudent(temp);
+		
+		head = head->getNext();
+	}
+}
+
+void mergeSort(StudentRecord &s1, Student* a, Student* b){
+	Student* midPointer;
+	Student* afterMid;
+	
+	if(a != b){
+		std::cout << "sort1" << std::endl;
+		
+		midPointer = getMidPointer(s1);
+		afterMid = midPointer->getNext();
+		
+		mergeSort(s1, a, midPointer);
+		
+		std::cout << "sort2" << std::endl;
+		mergeSort(s1, afterMid, b);
+		
+		merge(s1, a, midPointer, b);
+	}
+}
+
+	*node = merge(a, b);
+	std::cout << "merge3" << std::endl;
+	print(node);
+	std::cout << "\n" << std::endl;
+	
+	
+//quicksort
+void partition1(StudentRecord &s1, Student** start, Student** end, Student** lhsStart, Student** lhsEnd, Student** rhsStart, Student** rhsEnd){
+	Student* start1 = *start;
+	
+	Student* pivot = *end;
+	
+	Student* beforeStart = s1.getHead();
+	if(beforeStart == start1){
+		beforeStart = NULL;
+	}
+	else{
+		while(beforeStart->getNext() != start1){
+			beforeStart = beforeStart->getNext();
+		}
+	}
+	
+	Student* afterEnd = (*end)->getNext();
+	(*end)->setNext(NULL);
+	Student* pivotEnd = pivot;
+	
+	int i = 0;
+	
+	while(start1 != pivot){
+		if(start1->getScore() != pivot->getScore()){
+			if(start1->getScore() < pivot->getScore()){
+				Student* temp = start1->getNext();
+				start1->setNext(*lhsStart);
+				lhsStart = &start1;
+				start1 = temp;
+			}
+			else{
+				Student* temp = start1->getNext();
+				start1->setNext(*rhsStart);
+				rhsStart = &start1;
+				start1 = temp;
+			}
+		}
+		else{
+			Student* temp = start1->getNext();
+			pivotEnd->setNext(start1);
+			pivotEnd = pivotEnd->getNext();
+			pivotEnd->setNext(NULL);
+			start1 = temp;
+		}
+		
+		std::cout << "The loop is running for the " << ++i << "th time" << std::endl;
+	}
+	
+	//print(lhsStart);
+	//print(&pivot);
+	//print(rhsStart);	
+	
+	*lhsEnd = returnLast(*lhsStart);
+	//Student* pivotEnd = returnLast(pivot);
+	*rhsEnd = returnLast(*rhsEnd);
+	
+	if(beforeStart == NULL){
+		s1.setHead(*lhsStart);
+	}
+	else{
+		beforeStart->setNext(*lhsStart);
+	}
+	
+	(*lhsEnd)->setNext(pivot);
+	pivotEnd->setNext(*rhsStart);
+	(*rhsEnd)->setNext(afterEnd);
+}
